@@ -36,6 +36,7 @@ async function login(event) {
     byId("auth-screen").classList.add("hidden");
     byId("app-screen").classList.remove("hidden");
     renderShell();
+    startAutoRefresh();
     toast(`Bienvenue ${state.user.name}.`);
   } catch (error) {
     toast(error.message);
@@ -44,6 +45,7 @@ async function login(event) {
 
 async function logout() {
   await apiJson("/api/logout", "POST", {});
+  stopAutoRefresh();
   state.user = null;
   byId("app-screen").classList.add("hidden");
   byId("auth-screen").classList.remove("hidden");

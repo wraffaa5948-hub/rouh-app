@@ -7,6 +7,8 @@
   selectedRecipient: "",
   lastEmergencyCount: 0,
   activePdfUrl: "",
+  autoRefreshTimer: null,
+  autoRefreshBusy: false,
 };
 
 const roleLabels = {
@@ -19,9 +21,9 @@ const roleLabels = {
 };
 
 const menus = {
-  admin: ["dashboard", "requests", "users", "history"],
+  admin: ["dashboard", "requests", "users", "messages", "history"],
   patient: ["appointments", "medications", "homecare", "records", "sos", "smartwatch", "messages", "profile"],
-  doctor: ["dashboard", "requests", "teleconsultations", "schedule", "records", "prescriptions", "history", "profile"],
+  doctor: ["dashboard", "requests", "teleconsultations", "schedule", "records", "prescriptions", "messages", "history", "profile"],
   nurse: ["dashboard", "tasks", "patients", "messages", "history", "profile"],
   pharmacy: ["dashboard", "prescriptions", "history", "messages", "profile"],
   emergency: ["dashboard", "alerts", "history", "messages", "profile"],
@@ -60,6 +62,7 @@ async function boot() {
       byId("auth-screen").classList.add("hidden");
       byId("app-screen").classList.remove("hidden");
       renderShell();
+      startAutoRefresh();
     }
   } catch (error) {
     renderRolePicker();
@@ -67,6 +70,39 @@ async function boot() {
     toast("Connexion au serveur en cours. Rechargez la page si besoin.");
     console.error(error);
   }
+}
+
+function startAutoRefresh() {
+  stopAutoRefresh();
+  state.autoRefreshTimer = setInterval(autoRefreshApp, 15000);
+}
+
+function stopAutoRefresh() {
+  if (!state.autoRefreshTimer) return;
+  clearInterval(state.autoRefreshTimer);
+  state.autoRefreshTimer = null;
+}
+
+async function autoRefreshApp() {
+  if (!state.user || state.autoRefreshBusy || isUserEditing()) return;
+  state.autoRefreshBusy = true;
+  try {
+    const previousPage = state.page;
+    await refreshDb();
+    state.page = previousPage;
+    renderShell();
+  } catch (error) {
+    console.warn("Actualisation automatique interrompue", error);
+  } finally {
+    state.autoRefreshBusy = false;
+  }
+}
+
+function isUserEditing() {
+  const active = document.activeElement;
+  const isInputActive = active && ["INPUT", "TEXTAREA", "SELECT"].includes(active.tagName);
+  const modalOpen = !byId("modal-root").classList.contains("hidden");
+  return isInputActive || modalOpen;
 }
 
 function normalizeDb() {

@@ -130,7 +130,7 @@ function smartwatchPage() {
 }
 
 function messagesPage() {
-  const recipients = state.db.accounts.filter((account) => account.id !== state.user.id);
+  const recipients = messageRecipients();
   if (!state.selectedRecipient && recipients[0]) state.selectedRecipient = recipients[0].name;
   return `
     <div class="split">
@@ -138,6 +138,15 @@ function messagesPage() {
       <section class="panel chat"><h3>${state.selectedRecipient || "Conversation"}</h3><input id="message-to" type="hidden" value="${state.selectedRecipient}"><div id="conversation" class="conversation-window">${conversationHtml()}</div><textarea id="message-body" placeholder="Ecrire un message..."></textarea><button class="primary" data-action="sendMessage">Envoyer</button></section>
     </div>
   `;
+}
+
+function messageRecipients() {
+  const allowedForPatient = ["admin", "doctor", "nurse", "pharmacy", "emergency"];
+  return state.db.accounts.filter((account) => {
+    if (account.id === state.user.id) return false;
+    if (state.user.role === "patient") return allowedForPatient.includes(account.role);
+    return true;
+  });
 }
 
 function profilePage() {
