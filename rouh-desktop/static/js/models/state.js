@@ -50,11 +50,23 @@ const titles = {
 };
 
 async function boot() {
-  const response = await fetch("/api/bootstrap");
-  state.db = await response.json();
-  normalizeDb();
-  renderRolePicker();
-  bindAuth();
+  try {
+    await refreshDb();
+    renderRolePicker();
+    bindAuth();
+    if (state.db.current_user) {
+      state.user = state.db.current_user;
+      state.page = menus[state.user.role][0];
+      byId("auth-screen").classList.add("hidden");
+      byId("app-screen").classList.remove("hidden");
+      renderShell();
+    }
+  } catch (error) {
+    renderRolePicker();
+    bindAuth();
+    toast("Connexion au serveur en cours. Rechargez la page si besoin.");
+    console.error(error);
+  }
 }
 
 function normalizeDb() {

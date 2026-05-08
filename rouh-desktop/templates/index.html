@@ -27,9 +27,9 @@
     <main class="auth-card" id="login-panel">
       <h2>Bienvenue sur <span>ROUH</span></h2>
       <p>Connectez-vous a votre compte</p>
-      <form id="login-form" class="auth-form">
-        <label>Email ou numero de telephone<input id="login-id" type="text" value="admin@rouh.ma"></label>
-        <label>Mot de passe<input id="login-password" type="password" value="admin123"></label>
+      <form id="login-form" class="auth-form" autocomplete="off">
+        <label>Email ou numero de telephone<input id="login-id" type="text" autocomplete="off" value=""></label>
+        <label>Mot de passe<input id="login-password" type="password" autocomplete="new-password" value=""></label>
         <button type="submit" class="primary wide">Se connecter</button>
       </form>
       <button class="text-button" id="open-register">Vous n'avez pas de compte ? S'inscrire</button>
@@ -79,16 +79,17 @@
   </section>
   <div id="modal-root" class="modal-root hidden"></div>
 
-  <script src="/static/js/utils/icons.js"></script>
-  <script src="/static/js/models/state.js"></script>
-  <script src="/static/js/controllers/auth_controller.js"></script>
-  <script src="/static/js/controllers/shell_controller.js"></script>
-  <script src="/static/js/views/pages.js"></script>
-  <script src="/static/js/views/components.js"></script>
-  <script src="/static/js/controllers/page_actions_controller.js"></script>
-  <script src="/static/js/services/pdf_service.js"></script>
-  <script src="/static/js/models/selectors.js"></script>
-  <script src="/static/js/utils/formatters.js"></script>
-  <script src="/static/js/bootstrap.js"></script>
+  <script src="/static/js/utils/icons.js?v=20260508-2"></script>
+  <script src="/static/js/services/api_service.js?v=20260508-2"></script>
+  <script src="/static/js/models/state.js?v=20260508-2"></script>
+  <script src="/static/js/controllers/auth_controller.js?v=20260508-2"></script>
+  <script src="/static/js/controllers/shell_controller.js?v=20260508-2"></script>
+  <script src="/static/js/views/pages.js?v=20260508-2"></script>
+  <script src="/static/js/views/components.js?v=20260508-2"></script>
+  <script src="/static/js/controllers/page_actions_controller.js?v=20260508-2"></script>
+  <script src="/static/js/services/pdf_service.js?v=20260508-2"></script>
+  <script src="/static/js/models/selectors.js?v=20260508-2"></script>
+  <script src="/static/js/utils/formatters.js?v=20260508-2"></script>
+  <script src="/static/js/bootstrap.js?v=20260508-2"></script>
 </body>
 </html>

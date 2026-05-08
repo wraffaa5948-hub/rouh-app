@@ -6,26 +6,25 @@
   document.querySelectorAll("[data-action='reject']").forEach(button => button.addEventListener("click", () => updateRequest(Number(button.dataset.index), "Refuse")));
   document.querySelectorAll("[data-action='acceptAppointment']").forEach(button => button.addEventListener("click", () => updateAppointment(Number(button.dataset.index), { status: "Accepte" })));
   document.querySelectorAll("[data-action='rejectAppointment']").forEach(button => button.addEventListener("click", () => updateAppointment(Number(button.dataset.index), { status: "Refuse" })));
-  document.querySelectorAll("[data-action='cancelAppointment']").forEach(button => button.addEventListener("click", () => { patientAppointments()[Number(button.dataset.index)].status = "Annule"; toast("Envoye: rendez-vous annule."); renderShell(); }));
-  document.querySelectorAll("[data-action='dispatch']").forEach(button => button.addEventListener("click", () => { emergencyAlerts()[Number(button.dataset.index)].status = "Envoye a l'equipe"; toast("Envoye a l'equipe."); renderShell(); }));
+  document.querySelectorAll("[data-action='cancelAppointment']").forEach(button => button.addEventListener("click", () => updateAppointment(Number(button.dataset.index), { status: "Annule" }, true)));
+  document.querySelectorAll("[data-action='dispatch']").forEach(button => button.addEventListener("click", () => updateStatus("alert", emergencyAlerts()[Number(button.dataset.index)], "Envoye a l'equipe")));
   document.querySelectorAll("[data-action='pickDoctor']").forEach(button => button.addEventListener("click", () => { const select = document.querySelector("[data-form='appointment'] select[name='doctor']"); if (select) select.value = button.dataset.name; toast("Medecin choisi."); }));
   document.querySelectorAll("[data-action='pickPharmacy']").forEach(button => button.addEventListener("click", () => { state.db.selectedPharmacy = button.dataset.name; const input = byId("selected-pharmacy"); if (input) input.value = button.dataset.name; toast("Pharmacie selectionnee."); }));
   document.querySelectorAll("[data-action='pickNurse']").forEach(button => button.addEventListener("click", () => { state.db.selectedNurse = button.dataset.name; const input = byId("selected-nurse"); if (input) input.value = button.dataset.name; toast("Infirmier selectionne."); }));
   document.querySelectorAll("[data-action='selectRecipient']").forEach(button => button.addEventListener("click", () => { state.selectedRecipient = button.dataset.name; renderShell(); }));
-  document.querySelectorAll("[data-action='archiveUser']").forEach(button => button.addEventListener("click", () => { state.db.accounts[Number(button.dataset.index)].status = "Archive"; addHistory("Admin Rouh", "Utilisateur archive", "Archive"); toast("Utilisateur archive."); renderShell(); }));
+  document.querySelectorAll("[data-action='archiveUser']").forEach(button => button.addEventListener("click", () => updateStatus("user", state.db.accounts[Number(button.dataset.index)], "Archive")));
   document.querySelectorAll("[data-action='deleteUser']").forEach(button => button.addEventListener("click", () => { state.db.accounts.splice(Number(button.dataset.index), 1); addHistory("Admin Rouh", "Utilisateur supprime", "Archive"); toast("Utilisateur supprime."); renderShell(); }));
   bindForms();
 }
 
 function bindForms() {
-  bindSubmit("appointment", (data) => {
-    state.db.appointments.unshift({ id: nextId("RDV", state.db.appointments), patient: state.user.name, doctor: data.get("doctor"), date: `${data.get("date")} - ${data.get("time")}`, type: data.get("teleconsultation") ? "Teleconsultation" : "Cabinet", reason: data.get("reason"), status: "En attente" });
+  bindSubmit("appointment", async (data) => {
+    await apiJson("/api/appointments", "POST", formObject(data));
     toast("Envoye: rendez-vous demande au medecin.");
   });
-  bindSubmit("medicineOrder", (data) => {
+  bindSubmit("medicineOrder", async (data) => {
     const file = data.get("document");
-    state.db.pharmacy_orders.unshift({ id: nextId("ORD", state.db.pharmacy_orders), patient: state.user.name, pharmacy: data.get("pharmacy"), doctor: "-", document: file && file.name ? file.name : "ordonnance_importee.pdf", notes: data.get("notes"), date: "Envoye maintenant", status: "Recu" });
-    addHistory(state.user.name, `Commande envoyee a ${data.get("pharmacy")}`, "Recu");
+    await apiJson("/api/pharmacy-orders", "POST", { pharmacy: data.get("pharmacy"), document: file && file.name ? file.name : "ordonnance_importee.pdf", notes: data.get("notes") });
     toast("Envoye: commande transmise a la pharmacie.");
   });
   bindSubmit("reminder", (data) => {
@@ -42,10 +41,8 @@ function bindForms() {
     state.db.documents.unshift({ id: nextId("DOCM", state.db.documents), patient: state.user.name, title: file && file.name ? file.name : "Symptomes patient", type: file && file.name ? "Import" : "Symptomes", source: "Patient", date: "Envoye maintenant", status: "Archive" });
     toast("Envoye: document archive dans le dossier medical.");
   });
-  bindSubmit("medicalRecord", (data) => {
-    const row = { id: nextId("REC", state.db.medical_records), patient: data.get("patient"), age: data.get("age"), weight: data.get("weight"), height: data.get("height"), blood: data.get("blood"), status: data.get("status"), description: data.get("description") };
-    state.db.medical_records.unshift(row);
-    state.db.documents.unshift({ id: nextId("DOCM", state.db.documents), patient: row.patient, title: `Dossier medical - ${state.user.name}`, type: "Dossier", source: "Medecin", date: "Envoye maintenant", status: "Envoye" });
+  bindSubmit("medicalRecord", async (data) => {
+    await apiJson("/api/medical-records", "POST", formObject(data));
     toast("Envoye: dossier transmis au patient et archive.");
   });
   bindSubmit("meet", (data) => {
@@ -56,19 +53,18 @@ function bindForms() {
     state.db.appointments.unshift({ id: nextId("RDV", state.db.appointments), patient: data.get("patient"), doctor: state.user.name, date: data.get("date"), type: "Cabinet", reason: data.get("reason"), status: "Programme" });
     toast("Envoye: rendez-vous programme.");
   });
-  bindSubmit("prescription", (data) => {
-    const doc = `ordonnance_${Date.now().toString().slice(-5)}.pdf`;
-    state.db.prescriptions.unshift({ id: nextId("ORD", state.db.prescriptions), patient: data.get("patient"), doctor: state.user.name, document: doc, date: "Envoye maintenant", status: "Envoye pharmacie", medicine: data.get("medicine"), dosage: data.get("dosage"), instructions: data.get("instructions") });
-    state.db.pharmacy_orders.unshift({ id: nextId("ORD", state.db.pharmacy_orders), patient: data.get("patient"), doctor: state.user.name, document: doc, date: "Envoye maintenant", status: "A traiter" });
+  bindSubmit("prescription", async (data) => {
+    await apiJson("/api/prescriptions", "POST", formObject(data));
     toast("Envoye: ordonnance enregistree et transmise a la pharmacie.");
   });
   const sos = document.querySelector("[data-action='sos']");
   if (sos) sos.addEventListener("click", () => {
     const location = byId("location-box").textContent.replace("Position actuelle: ", "");
-    state.db.emergencies.unshift({ id: nextId("SOS", state.db.emergencies), patient: state.user.name, type: "SOS patient", location, gravity: "Critique", status: "Nouveau", team: "A assigner", time: "Maintenant" });
-    addHistory(state.user.name, "Alerte SOS declenchee", "Nouveau");
-    toast("Envoye: alerte SOS recue par le service urgence.");
-    renderShell();
+    apiJson("/api/emergency-alerts", "POST", { type: "SOS patient", location }).then(async () => {
+      toast("Envoye: alerte SOS recue par le service urgence.");
+      await refreshDb();
+      renderShell();
+    }).catch(error => toast(error.message));
   });
   const locate = document.querySelector("[data-action='locate']");
   if (locate) locate.addEventListener("click", locateUser);
@@ -91,10 +87,15 @@ function bindForms() {
 function bindSubmit(name, handler) {
   const form = document.querySelector(`[data-form='${name}']`);
   if (!form) return;
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    handler(new FormData(form));
-    renderShell();
+    try {
+      await handler(new FormData(form));
+      await refreshDb();
+      renderShell();
+    } catch (error) {
+      toast(error.message);
+    }
   });
 }
 
@@ -145,7 +146,7 @@ function closeModal() {
   byId("modal-root").innerHTML = "";
 }
 
-function saveModal(button) {
+async function saveModal(button) {
   const mode = button.dataset.modalSave;
   if (mode === "user") {
     const role = byId("modal-role").value;
@@ -163,12 +164,18 @@ function saveModal(button) {
   if (mode === "edit") {
     const row = rowFor(button.dataset.type, Number(button.dataset.index));
     if (row) {
-      row.status = byId("modal-status").value;
-      if ("date" in row) row.date = byId("modal-date").value;
-      if ("time" in row) row.time = byId("modal-date").value;
-      if ("reason" in row) row.reason = byId("modal-note").value;
-      if ("description" in row) row.description = byId("modal-note").value;
-      addHistory(state.user.name, `Modification ${button.dataset.type}`, row.status || "Modifie");
+      const type = button.dataset.type;
+      const status = byId("modal-status").value;
+      if (["appointmentDoctor", "appointmentHistory", "appointmentPatient"].includes(type)) {
+        await apiJson(`/api/appointments/${row.db_id}`, "PATCH", { status, date: byId("modal-date").value, reason: byId("modal-note").value });
+      } else if (type === "pharmacyOrder") {
+        await apiJson(`/api/status/pharmacyOrder/${row.db_id}`, "PATCH", { status });
+      } else if (type === "alert") {
+        await apiJson(`/api/status/alert/${row.db_id}`, "PATCH", { status });
+      } else if (type === "user") {
+        await apiJson(`/api/status/user/${row.db_id}`, "PATCH", { status });
+      }
+      await refreshDb();
       toast("Envoye: modification enregistree.");
     }
   }
@@ -176,17 +183,20 @@ function saveModal(button) {
   renderShell();
 }
 
-function updateRequest(index, status) {
-  state.db.registration_requests[index].status = status;
-  toast(`Envoye: demande ${status.toLowerCase()}.`);
-  renderShell();
+async function updateRequest(index, status) {
+  await updateStatus("request", state.db.registration_requests[index], status);
 }
 
-function updateAppointment(index, patch) {
-  Object.assign(doctorAppointments()[index], patch);
-  addHistory(state.user.name, `Rendez-vous ${patch.status}`, patch.status);
-  toast(`Envoye: rendez-vous ${patch.status.toLowerCase()}.`);
-  renderShell();
+async function updateAppointment(index, patch, patientScope = false) {
+  const row = patientScope ? patientAppointments()[index] : doctorAppointments()[index];
+  try {
+    await apiJson(`/api/appointments/${row.db_id}`, "PATCH", patch);
+    toast(`Envoye: rendez-vous ${patch.status.toLowerCase()}.`);
+    await refreshDb();
+    renderShell();
+  } catch (error) {
+    toast(error.message);
+  }
 }
 
 function addHistory(actor, event, status) {
@@ -250,10 +260,12 @@ function sendMessage() {
   const to = byId("message-to").value;
   const body = byId("message-body").value.trim();
   if (!body) return toast("Message vide.");
-  state.db.messages.unshift({ id: nextId("MSG", state.db.messages), from: state.user.name, to, role: state.user.role_label, body, time: "Envoye maintenant" });
-  byId("message-body").value = "";
-  toast("Envoye: message recu par le destinataire.");
-  renderShell();
+  apiJson("/api/messages", "POST", { to, body }).then(async () => {
+    byId("message-body").value = "";
+    toast("Envoye: message recu par le destinataire.");
+    await refreshDb();
+    renderShell();
+  }).catch(error => toast(error.message));
 }
 
 function importProfilePhoto(event) {
@@ -269,12 +281,32 @@ function importProfilePhoto(event) {
 }
 
 function saveProfileData() {
-  state.user.name = byId("profile-name-input").value;
-  state.user.email = byId("profile-email-input").value;
-  state.user.phone = byId("profile-phone-input").value;
-  state.user.title = byId("profile-title-input").value;
-  state.user.avatar = initials(state.user.name);
-  toast("Envoye: profil modifie.");
-  renderShell();
+  apiJson("/api/profile", "PATCH", {
+    name: byId("profile-name-input").value,
+    email: byId("profile-email-input").value,
+    phone: byId("profile-phone-input").value,
+    title: byId("profile-title-input").value,
+    photo: state.user.photo || "",
+  }).then(async (payload) => {
+    state.user = payload.user;
+    toast("Envoye: profil modifie.");
+    await refreshDb();
+    renderShell();
+  }).catch(error => toast(error.message));
+}
+
+function formObject(data) {
+  return Object.fromEntries([...data.entries()].map(([key, value]) => [key, value instanceof File ? value.name : value]));
+}
+
+async function updateStatus(type, row, status) {
+  try {
+    await apiJson(`/api/status/${type}/${row.db_id}`, "PATCH", { status });
+    toast("Modification enregistree.");
+    await refreshDb();
+    renderShell();
+  } catch (error) {
+    toast(error.message);
+  }
 }
 

@@ -1,6 +1,6 @@
-# ROUH Flask MVC
+# ROUH Flask MVC + PostgreSQL Neon
 
-ROUH est une application Flask MVC prete pour Vercel. Le design et les parcours existants sont conserves: patient, medecin, infirmier, pharmacie, urgence et administration.
+ROUH est une application Flask MVC connectee a PostgreSQL Neon via SQLAlchemy. Le design et les parcours existants sont conserves: patient, medecin, infirmier, pharmacie, urgence et administration.
 
 ## Structure
 
@@ -11,7 +11,10 @@ rouh-desktop/
 |-- controllers/
 |   `-- app_controller.py
 |-- models/
-|   `-- data_model.py
+|   |-- data_model.py
+|   `-- db_models.py
+|-- services/
+|-- migrations/
 |-- templates/
 |   `-- index.html
 |-- static/
@@ -26,6 +29,7 @@ rouh-desktop/
 ## Installation locale
 
 ```powershell
+copy .env.example .env
 pip install -r requirements.txt
 python api/index.py
 ```
@@ -36,11 +40,23 @@ Puis ouvrez:
 http://127.0.0.1:8010
 ```
 
-## Deploiement Vercel
+Pour Neon, remplacez `DATABASE_URL` dans `.env` par l'URL PostgreSQL Neon avec `sslmode=require`. Au premier lancement, les tables sont creees automatiquement et les comptes de demonstration sont importes en base.
 
-1. Poussez ce dossier sur GitHub.
-2. Importez le projet dans Vercel.
-3. Vercel utilise `vercel.json` et `api/index.py` automatiquement.
+## API principale
+
+- `POST /register` / `POST /api/register`
+- `POST /login` / `POST /api/login`
+- `POST /logout` / `POST /api/logout`
+- `GET /dashboard` / `GET /api/dashboard`
+- `GET|POST /appointments`
+- `GET|POST /prescriptions`
+- `GET|POST /messages`
+
+## Deploiement
+
+Backend recommande: Render ou Railway avec `gunicorn api.index:app`.
+
+Frontend: Vercel reste supporte via `vercel.json`. Voir `services/deployment.md`.
 
 ## Comptes fictifs
 
@@ -52,4 +68,3 @@ http://127.0.0.1:8010
 | Infirmier | fatima.zahra@rouh.ma | 06 32 21 10 00 | nurse123 |
 | Pharmacie | contact@pharmaciecentrale.ma | 05 22 33 44 55 | pharmacy123 |
 | Urgence | urgence.admin@rouh.ma | 06 12 34 56 78 | emergency123 |
-
