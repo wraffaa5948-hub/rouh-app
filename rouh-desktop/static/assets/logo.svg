@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 180" role="img" aria-label="ROUH">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#0067ff"/>
+      <stop offset=".45" stop-color="#0fc6d4"/>
+      <stop offset="1" stop-color="#052b78"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(22 12)">
+    <path d="M74 7c35 0 64 28 64 63s-29 63-64 63S10 105 10 70c0-24 14-45 34-56" fill="none" stroke="url(#g)" stroke-width="13" stroke-linecap="round"/>
+    <path d="M50 78h31l9-29 17 57 10-28h27" fill="none" stroke="url(#g)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M91 36h21v21h21v22h-21v21H91V79H70V57h21z" fill="#10cbbb"/>
+    <path d="M38 22c-2-12 8-17 18-20-1 11-7 18-18 20zm-4 4c-11-3-14-12-12-22 9 4 14 10 12 22z" fill="#12cdbf"/>
+  </g>
+  <g fill="url(#g)" transform="translate(178 47)">
+    <path d="M0 29c0-17 13-29 31-29h41v18H31c-7 0-12 5-12 11s5 11 12 11h41v18H31C13 58 0 46 0 29z"/>
+    <path d="M92 0h19v58H92z"/>
+    <path d="M132 0h19v35c0 5 5 9 11 9s11-4 11-9V0h19v35c0 15-13 25-30 25s-30-10-30-25z"/>
+    <path d="M214 0h19v21h34V0h19v58h-19V39h-34v19h-19z"/>
+  </g>
+  <text x="185" y="126" font-family="Arial, sans-serif" font-size="16" font-weight="700" letter-spacing="6" fill="#052b78">VOTRE SANTE, NOTRE PRIORITE</text>
+</svg>
