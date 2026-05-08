@@ -16,8 +16,9 @@ from config import config
 from database import get_session, init_db, remove_session
 
 app = Flask(__name__)
-app.template_folder = str(BASE_DIR / "templates")
-app.static_folder = str(BASE_DIR / "static")
+app.template_folder = str(BASE_DIR / "web_mvc" / "views" if (BASE_DIR / "web_mvc" / "views").exists() else BASE_DIR / "templates")
+app.static_folder = str(BASE_DIR / "web_mvc" / "assets" if (BASE_DIR / "web_mvc" / "assets").exists() else BASE_DIR / "static")
+app.static_url_path = "/static"
 app.config.from_object(config)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 init_db()
