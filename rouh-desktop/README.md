@@ -8,6 +8,7 @@ ROUH est une application Flask MVC connectee a PostgreSQL Neon via SQLAlchemy. L
 rouh-desktop/
 |-- api/
 |   `-- index.py
+|-- app.py
 |-- controllers/
 |   `-- app_controller.py
 |-- models/
@@ -67,9 +68,9 @@ Pour l'envoi du code "mot de passe oublie", configurez aussi `SMTP_USER`, `SMTP_
 
 ## Deploiement
 
-Vercel est configure via `vercel.json` et `pyproject.toml`.
+Vercel est configure via `app.py`, `pyproject.toml` et un `vercel.json` minimal.
 
-Toutes les requetes sont routees vers `api/index.py`, et Flask sert les vues depuis `web_mvc/views` et les assets depuis `web_mvc/assets`.
+`app.py` expose l'application Flask pour Vercel. Le vrai code Flask reste dans `api/index.py`, les vues dans `web_mvc/views` et les assets dans `web_mvc/assets`.
 
 ## Trouver le fichier d'une page
 

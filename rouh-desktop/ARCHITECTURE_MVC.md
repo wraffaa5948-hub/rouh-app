@@ -4,6 +4,7 @@
 rouh-desktop/
 |-- api/
 |   `-- index.py              # Application Flask compatible Vercel
+|-- app.py                    # Point d'entree Flask detecte par Vercel
 |-- controllers/
 |   `-- app_controller.py     # Controleur MVC
 |-- models/

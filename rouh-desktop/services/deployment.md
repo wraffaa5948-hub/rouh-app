@@ -13,8 +13,10 @@ Les tables sont creees automatiquement au demarrage par SQLAlchemy. La migration
 
 Le projet est pret pour Vercel avec:
 
-- `vercel.json`: toutes les requetes sont routees vers `api/index.py`.
-- `pyproject.toml`: indique explicitement l'entrypoint Flask `api.index:app`.
+- `app.py`: exporte l'objet Flask `app` pour la detection automatique Vercel.
+- `api/index.py`: contient les routes Flask.
+- `vercel.json`: reste minimal pour eviter les erreurs de pattern `functions`.
+- `pyproject.toml`: indique explicitement l'entrypoint Flask `app:app`.
 - `web_mvc/views`: templates Flask.
 - `web_mvc/assets`: CSS, JS et images servis par Flask sous `/static`.
 
