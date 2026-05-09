@@ -25,7 +25,17 @@ DATABASE_URL=postgresql://USER:PASSWORD@HOST.neon.tech/DBNAME?sslmode=require
 SECRET_KEY=...
 FLASK_ENV=production
 SESSION_COOKIE_SECURE=true
+SESSION_COOKIE_SAMESITE=Lax
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=contact.rouh.ma@gmail.com
+SMTP_PASSWORD=mot-de-passe-application-google
+SMTP_FROM=contact.rouh.ma@gmail.com
 ```
+
+Sans `DATABASE_URL`, l'application utilise SQLite en local. Sur Vercel, un SQLite temporaire dans `/tmp` permet d'eviter un crash de demarrage, mais les donnees ne sont pas persistantes. Pour une vraie application, gardez Neon PostgreSQL dans `DATABASE_URL`.
+
+Au demarrage, `database.py` cree les tables manquantes et ajoute les petites colonnes attendues par l'application si une base Neon existe deja.
 
 ## Backend Render ou Railway
 

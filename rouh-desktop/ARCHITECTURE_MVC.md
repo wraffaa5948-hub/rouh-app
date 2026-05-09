@@ -9,7 +9,7 @@ rouh-desktop/
 |-- models/
 |   |-- data_model.py         # Donnees demo
 |   `-- db_models.py          # Modeles SQLAlchemy PostgreSQL
-|-- services/                 # Services backend
+|-- services/                 # Services backend decoupes par responsabilite
 |-- web_mvc/
 |   |-- PAGE_MAP.md           # Carte simple page -> fichier -> fonction
 |   |-- views/
@@ -32,7 +32,13 @@ rouh-desktop/
 
 ## Controleur
 
-`controllers/app_controller.py` contient la logique metier: authentification, bootstrap, rendez-vous, ordonnances, messages, urgences, profil et historique.
+`controllers/app_controller.py` reste la facade MVC appelee par Flask. Il delegue maintenant vers des sous-fichiers Python pour rendre les modifications plus simples:
+
+- `services/bootstrap_service.py`: initialisation demo et payload principal.
+- `services/account_service.py`: inscription, connexion, profil et mot de passe oublie.
+- `services/medical_service.py`: rendez-vous, ordonnances, dossiers, messages, pharmacie et urgences.
+- `services/status_service.py`: changements de statut.
+- `services/email_service.py`: envoi du code de reinitialisation par email.
 
 ## Vue
 

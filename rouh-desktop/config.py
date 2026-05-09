@@ -6,6 +6,7 @@ from pathlib import Path
 
 
 BASE_DIR = Path(__file__).resolve().parent
+IS_VERCEL = os.getenv("VERCEL", "").lower() == "1" or os.getenv("VERCEL_ENV", "") != ""
 
 
 def load_dotenv(path: Path | None = None) -> None:
@@ -27,8 +28,9 @@ load_dotenv()
 @dataclass(frozen=True)
 class Config:
     SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-change-me")
-    DATABASE_URL: str = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'rouh_local.db'}")
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:////tmp/rouh_local.db" if IS_VERCEL else f"sqlite:///{BASE_DIR / 'rouh_local.db'}")
     FLASK_ENV: str = os.getenv("FLASK_ENV", "development")
+    IS_VERCEL: bool = IS_VERCEL
     SESSION_COOKIE_SECURE: bool = os.getenv("SESSION_COOKIE_SECURE", "false").lower() == "true"
     SESSION_COOKIE_HTTPONLY: bool = True
     SESSION_COOKIE_SAMESITE: str = os.getenv("SESSION_COOKIE_SAMESITE", "Lax")

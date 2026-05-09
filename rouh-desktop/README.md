@@ -14,6 +14,14 @@ rouh-desktop/
 |   |-- data_model.py
 |   `-- db_models.py
 |-- services/
+|   |-- account_service.py
+|   |-- bootstrap_service.py
+|   |-- email_service.py
+|   |-- medical_service.py
+|   |-- security.py
+|   |-- serializers.py
+|   |-- status_service.py
+|   `-- validators.py
 |-- migrations/
 |-- web_mvc/
 |   |-- PAGE_MAP.md
@@ -44,6 +52,8 @@ http://127.0.0.1:8010
 ```
 
 Pour Neon, remplacez `DATABASE_URL` dans `.env` par l'URL PostgreSQL Neon avec `sslmode=require`. Au premier lancement, les tables sont creees automatiquement et les comptes de demonstration sont importes en base.
+
+Pour l'envoi du code "mot de passe oublie", configurez aussi `SMTP_USER`, `SMTP_PASSWORD` et `SMTP_FROM` avec le compte `contact.rouh.ma@gmail.com`.
 
 ## API principale
 
