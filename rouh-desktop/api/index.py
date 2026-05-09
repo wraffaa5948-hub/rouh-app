@@ -176,6 +176,18 @@ def reset_password():
     return jsonify(controller().reset_password_request(str(json_data().get("email", ""))))
 
 
+@app.post("/api/password/confirm")
+def confirm_password_reset():
+    data = json_data()
+    return jsonify(
+        controller().confirm_password_reset(
+            str(data.get("email", "")),
+            str(data.get("code", "")),
+            str(data.get("password", "")),
+        )
+    )
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "app": "ROUH"}

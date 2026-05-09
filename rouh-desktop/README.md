@@ -15,14 +15,17 @@ rouh-desktop/
 |   `-- db_models.py
 |-- services/
 |-- migrations/
-|-- templates/
-|   `-- index.html
-|-- static/
-|   |-- assets/
-|   |-- js/
-|   `-- styles.css
+|-- web_mvc/
+|   |-- PAGE_MAP.md
+|   |-- views/
+|   |   `-- index.html
+|   `-- assets/
+|       |-- assets/
+|       |-- js/
+|       `-- styles.css
 |-- requirements.txt
 |-- vercel.json
+|-- pyproject.toml
 `-- README.md
 ```
 
@@ -54,9 +57,17 @@ Pour Neon, remplacez `DATABASE_URL` dans `.env` par l'URL PostgreSQL Neon avec `
 
 ## Deploiement
 
-Backend recommande: Render ou Railway avec `gunicorn api.index:app`.
+Vercel est configure via `vercel.json` et `pyproject.toml`.
 
-Frontend: Vercel reste supporte via `vercel.json`. Voir `services/deployment.md`.
+Toutes les requetes sont routees vers `api/index.py`, et Flask sert les vues depuis `web_mvc/views` et les assets depuis `web_mvc/assets`.
+
+## Trouver le fichier d'une page
+
+Ouvrez `web_mvc/PAGE_MAP.md`. Ce fichier indique pour chaque page du menu:
+
+- le nom technique de la page;
+- le fichier responsable;
+- la fonction JavaScript responsable.
 
 ## Comptes fictifs
 

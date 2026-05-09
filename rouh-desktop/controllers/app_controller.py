@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from datetime import datetime, timedelta
+from random import SystemRandom
 from secrets import token_urlsafe
 
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
+from config import config
 from models.data_model import get_fake_database
 from models.db_models import (
     ActivityLog,
@@ -34,6 +37,7 @@ from services.serializers import (
     public_user,
     request_row,
 )
+from services.email_service import send_reset_code
 from services.validators import normalize_role, split_name, validate_email
 
 
@@ -258,12 +262,36 @@ class WebAppController:
 
     def reset_password_request(self, email: str) -> dict[str, object]:
         user = self.db.query(User).filter(User.email == email.strip().lower()).first()
-        token = token_urlsafe(24)
         if user:
-            user.reset_token_hash = hash_password(token)
-            self._log(user.full_name, "Demande reset password", "Envoye")
+            code = f"{SystemRandom().randint(100000, 999999)}"
+            user.reset_token_hash = hash_password(code)
+            user.reset_token_expires_at = datetime.utcnow() + timedelta(minutes=15)
+            email_sent = send_reset_code(config, user.email, code)
+            status = "Envoye" if email_sent else "SMTP non configure"
+            self._log(user.full_name, "Code reset password genere", status)
             self.db.commit()
-        return {"message": "Si le compte existe, un lien de reinitialisation est genere.", "dev_token": token if user else ""}
+        return {"message": "Si le compte existe, un code de verification est envoye par email."}
+
+    def confirm_password_reset(self, email: str, code: str, new_password: str) -> dict[str, object]:
+        clean_email = email.strip().lower()
+        user = self.db.query(User).filter(User.email == clean_email).first()
+        if not user or not user.reset_token_hash:
+            raise ValueError("Code invalide ou expire.")
+        if user.reset_token_expires_at and user.reset_token_expires_at < datetime.utcnow():
+            user.reset_token_hash = ""
+            user.reset_token_expires_at = None
+            self.db.commit()
+            raise ValueError("Code invalide ou expire.")
+        if not verify_password(code.strip(), user.reset_token_hash):
+            raise ValueError("Code invalide ou expire.")
+        if len(new_password) < 6:
+            raise ValueError("Le mot de passe doit contenir au moins 6 caracteres.")
+        user.mot_de_passe_hash = hash_password(new_password)
+        user.reset_token_hash = ""
+        user.reset_token_expires_at = None
+        self._log(user.full_name, "Mot de passe reinitialise", "Succes")
+        self.db.commit()
+        return {"message": "Mot de passe reinitialise avec succes."}
 
     def _log(self, actor: str, event: str, status: str) -> None:
         self.db.add(ActivityLog(actor_name=actor, event=event, status=status))

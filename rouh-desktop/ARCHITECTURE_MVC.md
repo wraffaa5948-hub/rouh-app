@@ -7,39 +7,55 @@ rouh-desktop/
 |-- controllers/
 |   `-- app_controller.py     # Controleur MVC
 |-- models/
-|   `-- data_model.py         # Donnees demo
-|-- templates/
-|   `-- index.html            # Template Flask
-|-- static/
-|   |-- assets/               # Images
-|   |-- js/                   # Vue JS decoupee
-|   `-- styles.css            # Styles
+|   |-- data_model.py         # Donnees demo
+|   `-- db_models.py          # Modeles SQLAlchemy PostgreSQL
+|-- services/                 # Services backend
+|-- web_mvc/
+|   |-- PAGE_MAP.md           # Carte simple page -> fichier -> fonction
+|   |-- views/
+|   |   `-- index.html        # Template Flask
+|   `-- assets/
+|       |-- assets/           # Images
+|       |-- js/               # MVC frontend
+|       `-- styles.css        # Styles
 |-- requirements.txt
 |-- vercel.json
+|-- pyproject.toml
 `-- README.md
 ```
 
 ## Modele
 
-`models/data_model.py` contient la base fictive: comptes, patients, medecins, infirmiers, pharmacies, urgences, rendez-vous, prescriptions, soins, messages et activites.
+`models/db_models.py` contient les tables SQLAlchemy connectees a PostgreSQL Neon.
+
+`models/data_model.py` contient les donnees de demonstration utilisees pour initialiser la base si elle est vide.
 
 ## Controleur
 
-`controllers/app_controller.py` expose le payload complet a la route Flask `/api/bootstrap`.
+`controllers/app_controller.py` contient la logique metier: authentification, bootstrap, rendez-vous, ordonnances, messages, urgences, profil et historique.
 
 ## Vue
 
-`templates/index.html`, `static/styles.css` et `static/js/` construisent l'experience utilisateur sans changer le design ROUH.
+`web_mvc/views/index.html`, `web_mvc/assets/styles.css` et `web_mvc/assets/js/` construisent l'experience utilisateur sans changer le design ROUH.
 
 Le JavaScript est organise par responsabilite:
 
-- `models/`: etat local et selecteurs de donnees.
-- `controllers/`: authentification, navigation et actions utilisateur.
-- `views/`: pages et composants HTML.
-- `services/`: generation et ouverture des PDF.
-- `utils/`: icones, formatage, badges, avatars et helpers DOM.
+- `web_mvc/assets/js/models/`: etat local, menus et selecteurs de donnees.
+- `web_mvc/assets/js/controllers/`: authentification, navigation et actions utilisateur.
+- `web_mvc/assets/js/views/`: pages, composants HTML et carte des pages.
+- `web_mvc/assets/js/services/`: appels API et generation PDF.
+- `web_mvc/assets/js/utils/`: icones, formatage, badges, avatars et helpers DOM.
+
+## Trouver le fichier responsable d'une page
+
+La methode simple est:
+
+1. Ouvrir `web_mvc/PAGE_MAP.md`.
+2. Chercher le nom de la page.
+3. Ouvrir le fichier et la fonction indiques.
+
+La meme carte existe en JavaScript dans `web_mvc/assets/js/views/page_map.js`.
 
 ## Icones
 
-Toutes les icones de l'application sont centralisees dans `static/js/utils/icons.js`.
-
+Toutes les icones de l'application sont centralisees dans `web_mvc/assets/js/utils/icons.js`.

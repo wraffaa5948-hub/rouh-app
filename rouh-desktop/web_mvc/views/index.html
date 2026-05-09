@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROUH</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <section id="auth-screen" class="auth-screen">
+    <aside class="auth-brand">
+      <img class="auth-logo" src="/static/assets/logo.png" alt="ROUH">
+      <h1 id="auth-title">Une plateforme complete pour votre sante</h1>
+      <p id="auth-copy">Rendez-vous, teleconsultation, dossier medical, pharmacie, soins a domicile et urgence SOS 24/7.</p>
+      <div class="feature-list">
+        <span data-icon="calendar">Prise de rendez-vous</span>
+        <span data-icon="video">Teleconsultation</span>
+        <span data-icon="file">Dossier medical</span>
+        <span data-icon="pill">Commandes de medicaments</span>
+        <span data-icon="home">Soins a domicile</span>
+        <span data-icon="sos">Urgence SOS 24/7</span>
+      </div>
+    </aside>
+
+    <main class="auth-card" id="login-panel">
+      <h2>Bienvenue sur <span>ROUH</span></h2>
+      <p>Connectez-vous a votre compte</p>
+      <form id="login-form" class="auth-form" autocomplete="off">
+        <label>Email ou numero de telephone<input id="login-id" type="text" autocomplete="off" value=""></label>
+        <label>Mot de passe<input id="login-password" type="password" autocomplete="new-password" value=""></label>
+        <button type="submit" class="primary wide">Se connecter</button>
+      </form>
+      <button class="text-button" id="open-reset">Mot de passe oublie ?</button>
+      <button class="text-button" id="open-register">Vous n'avez pas de compte ? S'inscrire</button>
+    </main>
+
+    <main class="register-card hidden" id="register-panel">
+      <h2>Creer un compte</h2>
+      <p>Remplissez les informations pour creer votre compte ROUH</p>
+      <div class="steps"><b>1</b><span></span><b>2</b><span></span><b>3</b></div>
+      <form id="register-form" class="register-form">
+        <div id="role-picker" class="role-picker"></div>
+        <div class="form-grid">
+          <label>Nom complet<input id="reg-name" type="text" value="" autocomplete="name"></label>
+          <label>Email<input id="reg-email" type="email" value="" autocomplete="email"></label>
+          <label>Numero de telephone<input id="reg-phone" type="text" value="" autocomplete="tel"></label>
+          <label>Mot de passe<input id="reg-password" type="password" value="" autocomplete="new-password"></label>
+          <label id="specialty-field" class="hidden">Specialite<input id="reg-specialty" type="text" value=""></label>
+        </div>
+        <div class="auth-actions">
+          <button type="button" class="secondary" id="back-login">Annuler</button>
+          <button type="submit" class="primary">Suivant</button>
+        </div>
+      </form>
+    </main>
+  </section>
+
+  <section id="app-screen" class="app-screen hidden">
+    <aside class="sidebar">
+      <img src="/static/assets/logo.png" alt="ROUH" class="side-logo">
+      <nav id="side-nav"></nav>
+      <button id="logout-button" class="logout">Deconnexion</button>
+    </aside>
+    <main class="workspace">
+      <header class="topbar">
+        <div>
+          <p id="screen-number" class="screen-number">01</p>
+          <h2 id="page-title">Tableau de bord</h2>
+          <span id="page-subtitle">Bienvenue sur ROUH</span>
+        </div>
+        <div class="profile-chip">
+          <div id="profile-avatar" class="avatar">AR</div>
+          <div><strong id="profile-name">Admin Rouh</strong><small id="profile-role">Administrateur</small></div>
+        </div>
+      </header>
+      <div id="page-content" class="page-content"></div>
+    </main>
+  </section>
+  <div id="modal-root" class="modal-root hidden"></div>
+
+  <script src="/static/js/utils/icons.js?v=20260508-4"></script>
+  <script src="/static/js/services/api_service.js?v=20260508-4"></script>
+  <script src="/static/js/models/state.js?v=20260508-4"></script>
+  <script src="/static/js/controllers/auth_controller.js?v=20260509-1"></script>
+  <script src="/static/js/controllers/shell_controller.js?v=20260508-4"></script>
+  <script src="/static/js/views/pages.js?v=20260508-4"></script>
+  <script src="/static/js/views/page_map.js?v=20260508-5"></script>
+  <script src="/static/js/views/components.js?v=20260508-4"></script>
+  <script src="/static/js/controllers/page_actions_controller.js?v=20260508-4"></script>
+  <script src="/static/js/services/pdf_service.js?v=20260508-4"></script>
+  <script src="/static/js/models/selectors.js?v=20260508-4"></script>
+  <script src="/static/js/utils/formatters.js?v=20260508-4"></script>
+  <script src="/static/js/bootstrap.js?v=20260508-4"></script>
+</body>
+</html>
